@@ -2,7 +2,10 @@ import React from 'react';
 import { Grid, Typography, Button } from '@mui/material';
 import NotificationBell from './NotificationBell';
 
-const DashboardHeader = ({ title, subtitle, onLogout }) => {
+const DashboardHeader = ({ title, subtitle, onLogout, isLight = false }) => {
+  const titleColor = isLight ? '#f4fbff' : 'text.primary';
+  const subtitleColor = isLight ? 'rgba(229,245,255,0.82)' : 'text.secondary';
+
   return (
     <Grid
       container
@@ -12,10 +15,10 @@ const DashboardHeader = ({ title, subtitle, onLogout }) => {
       sx={{ mb: 3, px: 2, pt: 2 }}
     >
       <Grid size={{ xs: 12, md: 9 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ color: titleColor, fontWeight: 800 }}>
           {title}
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: subtitleColor }}>
           {subtitle}
         </Typography>
       </Grid>
@@ -25,7 +28,12 @@ const DashboardHeader = ({ title, subtitle, onLogout }) => {
             <NotificationBell />
           </Grid>
           <Grid size="grow">
-            <Button variant="outlined" fullWidth onClick={onLogout}>
+            <Button
+              variant="outlined"
+              className={isLight ? 'subtle-button' : undefined}
+              fullWidth
+              onClick={onLogout}
+            >
               Logout
             </Button>
           </Grid>

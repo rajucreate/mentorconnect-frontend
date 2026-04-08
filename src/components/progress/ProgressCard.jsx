@@ -27,21 +27,22 @@ const ProgressCard = ({ progress, canManage, onEdit }) => {
   const updatedAt = progress?.updatedAt || progress?.updatedDate || progress?.createdAt;
 
   return (
-    <Card variant="outlined" sx={{ mb: 1 }}>
+    <Card className="glass-card" variant="outlined" sx={{ mb: 1 }}>
       <CardContent>
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1" gutterBottom sx={{ color: '#f2fbff', fontWeight: 700 }}>
           {title}
         </Typography>
-        <Typography variant="body2" sx={{ mb: 1 }}>
+        <Typography variant="body2" sx={{ mb: 1, color: 'rgba(232,244,255,0.88)' }}>
           {description}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'rgba(219,234,254,0.78)' }}>
           Last updated: {formatUpdatedDate(updatedAt)}
         </Typography>
         {canManage && (
           <Grid container sx={{ mt: 1 }}>
             <Button
-              variant="text"
+              variant="outlined"
+              className="subtle-button"
               size="small"
               disabled={!progressId}
               onClick={() => onEdit(progress)}

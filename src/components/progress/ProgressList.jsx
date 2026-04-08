@@ -4,9 +4,11 @@ import {
   Button,
   CircularProgress,
   Grid,
+  Skeleton,
   Snackbar,
   Typography,
 } from '@mui/material';
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
 import {
   createProgress,
   getProgressByMatch,
@@ -127,20 +129,26 @@ const ProgressList = ({ matchId, canManage }) => {
   return (
     <Grid container spacing={1} sx={{ mt: 1 }}>
       <Grid size={12}>
-        <Typography variant="subtitle2">Progress</Typography>
+        <Typography variant="subtitle2" sx={{ color: '#e5f4ff', fontWeight: 700 }}>Progress</Typography>
       </Grid>
 
       {canManage && (
         <Grid size={12}>
-          <Button variant="outlined" size="small" onClick={handleOpenCreate}>
+          <Button variant="outlined" className="subtle-button" size="small" onClick={handleOpenCreate}>
             Add Progress
           </Button>
         </Grid>
       )}
 
       {loading && (
-        <Grid size={12} sx={{ py: 2, textAlign: 'center' }}>
-          <CircularProgress size={20} />
+        <Grid size={12} sx={{ py: 1 }}>
+          <Grid container spacing={1}>
+            {[1, 2].map((item) => (
+              <Grid size={12} key={item}>
+                <Skeleton variant="rounded" height={96} sx={{ bgcolor: 'rgba(255,255,255,0.18)' }} />
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
       )}
 
@@ -152,7 +160,10 @@ const ProgressList = ({ matchId, canManage }) => {
 
       {!loading && !error && items.length === 0 && (
         <Grid size={12}>
-          <Typography variant="body2">No progress yet.</Typography>
+          <Grid className="empty-state">
+            <InsightsOutlinedIcon className="icon" />
+            <Typography variant="body2">No progress yet. Start tracking your goals here.</Typography>
+          </Grid>
         </Grid>
       )}
 

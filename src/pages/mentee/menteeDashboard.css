@@ -1,0 +1,168 @@
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mentee-dashboard-root {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(130deg, #2e1a6f 0%, #15397d 48%, #016fa7 100%);
+  background-size: 220% 220%;
+  animation: gradientShift 18s ease infinite;
+  overflow: hidden;
+}
+
+.mentee-dashboard-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(50px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.mentee-dashboard-glow.one {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  left: -70px;
+  background: #58d5ff;
+}
+
+.mentee-dashboard-glow.two {
+  width: 300px;
+  height: 300px;
+  right: -100px;
+  top: 180px;
+  background: #8577ff;
+}
+
+.mentee-dashboard-content {
+  position: relative;
+  z-index: 2;
+  animation: fadeInUp 0.55s ease both;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.13) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 18px !important;
+  box-shadow: 0 14px 32px rgba(9, 17, 43, 0.24);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 24px 44px rgba(10, 16, 41, 0.34);
+}
+
+.section-title {
+  color: #eaf6ff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+}
+
+.section-subtitle {
+  color: rgba(234, 246, 255, 0.8) !important;
+}
+
+.metric-card {
+  min-height: 116px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.gradient-button {
+  background: linear-gradient(94deg, #5a74ff 0%, #33c6ff 100%) !important;
+  color: #f7fcff !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+  box-shadow: 0 12px 22px rgba(51, 126, 255, 0.36);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.gradient-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(62, 158, 255, 0.5);
+  filter: brightness(1.06);
+}
+
+.gradient-button:disabled {
+  background: linear-gradient(90deg, #8aa2bb 0%, #7b8da6 100%) !important;
+  color: rgba(244, 249, 255, 0.8) !important;
+  box-shadow: none;
+}
+
+.subtle-button {
+  border-color: rgba(226, 242, 255, 0.45) !important;
+  color: #eaf6ff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(4px);
+}
+
+.subtle-button:hover {
+  border-color: rgba(226, 242, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.empty-state {
+  text-align: center;
+  color: #e7f7ff;
+  padding: 18px 10px;
+}
+
+.empty-state .icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+  opacity: 0.95;
+}
+
+.card-enter {
+  animation: fadeInUp 0.5s ease both;
+}
+
+.modal-paper {
+  border-radius: 18px !important;
+  background: linear-gradient(160deg, #0f3f69 0%, #154174 55%, #1f3163 100%) !important;
+  border: 1px solid rgba(204, 236, 255, 0.3);
+  color: #f4fbff;
+  box-shadow: 0 24px 46px rgba(4, 10, 28, 0.45);
+  animation: modalEnter 0.24s ease both;
+}
+
+@media (max-width: 768px) {
+  .mentee-dashboard-root {
+    padding-bottom: 28px;
+  }
+}
