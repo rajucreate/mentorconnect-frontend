@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
+import AuthHeader from '../components/AuthHeader';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -106,6 +107,7 @@ const Register = () => {
       }}
     >
       <Container maxWidth="xs">
+        <AuthHeader />
         <Card
           elevation={0}
           sx={{

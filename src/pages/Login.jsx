@@ -14,6 +14,7 @@ import {
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
+import AuthHeader from '../components/AuthHeader';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -89,6 +90,7 @@ const Login = () => {
       }}
     >
       <Container maxWidth="xs">
+        <AuthHeader />
         <Card
           elevation={0}
           sx={{

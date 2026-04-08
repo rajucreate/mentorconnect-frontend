@@ -10,6 +10,26 @@ import {
   Stack,
 } from '@mui/material';
 
+const pickValue = (...values) => values.find((value) => value !== undefined && value !== null && value !== '');
+
+const getPersonDisplay = (entity, fallbacks = {}) => {
+  const profile = entity?.user || entity?.profile || entity;
+  return (
+    pickValue(
+      entity?.name,
+      entity?.fullName,
+      entity?.username,
+      profile?.name,
+      profile?.fullName,
+      profile?.username,
+      entity?.email,
+      profile?.email,
+      fallbacks?.name,
+      fallbacks?.email
+    ) || 'N/A'
+  );
+};
+
 const getStatusColor = (status) => {
   const normalizedStatus = String(status || '').toUpperCase();
 
@@ -57,17 +77,53 @@ const SessionTable = ({ sessions, onUpdateSessionStatus, processingSessionId }) 
       <TableBody>
         {sessions.map((session, index) => {
           const sessionId = session.id || session._id || session.sessionId || session?.session?.id || session?.session?._id;
-          const key = sessionId || `${session.mentorName || 'mentor'}-${session.menteeName || 'mentee'}-${index}`;
+          const mentorLabel = getPersonDisplay(session?.mentor, {
+            name: session?.mentorName,
+            email: session?.mentorEmail,
+          });
+          const menteeLabel = getPersonDisplay(session?.mentee, {
+            name: session?.menteeName,
+            email: session?.menteeEmail,
+          });
+          const key = sessionId || `${mentorLabel}-${menteeLabel}-${index}`;
           const status = String(session.status || 'PENDING').toUpperCase();
           const isPending = status === 'PENDING';
           const isProcessing = processingSessionId === sessionId;
 
+          const startValue =
+            pickValue(
+              session.startTime,
+              session.startDateTime,
+              session.dateTime,
+              session.scheduledAt,
+              session.sessionDate,
+              session.date,
+              session.createdAt,
+              session?.session?.startTime,
+              session?.session?.startDateTime,
+              session?.session?.dateTime,
+              session?.session?.scheduledAt,
+              session?.session?.sessionDate,
+              session?.session?.date,
+              session?.session?.createdAt
+            );
+
+          const endValue =
+            pickValue(
+              session.endTime,
+              session.endDateTime,
+              session.endDate,
+              session?.session?.endTime,
+              session?.session?.endDateTime,
+              session?.session?.endDate
+            );
+
           return (
             <TableRow key={key}>
-              <TableCell>{session?.mentor?.name || session.mentorName || session?.mentor?.email || 'N/A'}</TableCell>
-              <TableCell>{session?.mentee?.name || session.menteeName || session?.mentee?.email || 'N/A'}</TableCell>
-              <TableCell>{formatDateTime(session.startTime || session.startDateTime || session.dateTime)}</TableCell>
-              <TableCell>{formatDateTime(session.endTime || session.endDateTime || session.endDate)}</TableCell>
+              <TableCell>{mentorLabel}</TableCell>
+              <TableCell>{menteeLabel}</TableCell>
+              <TableCell>{formatDateTime(startValue)}</TableCell>
+              <TableCell>{formatDateTime(endValue)}</TableCell>
               <TableCell>
                 <Chip label={status} color={getStatusColor(status)} size="small" />
               </TableCell>

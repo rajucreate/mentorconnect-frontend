@@ -10,6 +10,26 @@ import {
   Stack,
 } from '@mui/material';
 
+const pickValue = (...values) => values.find((value) => value !== undefined && value !== null && value !== '');
+
+const getPersonDisplay = (entity, fallbacks = {}) => {
+  const profile = entity?.user || entity?.profile || entity;
+  return (
+    pickValue(
+      entity?.name,
+      entity?.fullName,
+      entity?.username,
+      profile?.name,
+      profile?.fullName,
+      profile?.username,
+      entity?.email,
+      profile?.email,
+      fallbacks?.name,
+      fallbacks?.email
+    ) || 'N/A'
+  );
+};
+
 const getStatusColor = (status) => {
   const normalizedStatus = String(status || '').toUpperCase();
 
@@ -39,15 +59,23 @@ const MatchTable = ({ matches, onUpdateMatchStatus, processingMatchId }) => {
       <TableBody>
         {matches.map((match, index) => {
           const matchId = match.id || match._id || match.matchId;
-          const key = matchId || `${match.mentorName || 'mentor'}-${match.menteeName || 'mentee'}-${index}`;
+          const mentorLabel = getPersonDisplay(match?.mentor, {
+            name: match?.mentorName,
+            email: match?.mentorEmail,
+          });
+          const menteeLabel = getPersonDisplay(match?.mentee, {
+            name: match?.menteeName,
+            email: match?.menteeEmail,
+          });
+          const key = matchId || `${mentorLabel}-${menteeLabel}-${index}`;
           const status = String(match.status || 'PENDING').toUpperCase();
           const isPending = status === 'PENDING';
           const isProcessing = processingMatchId === matchId;
 
           return (
             <TableRow key={key}>
-              <TableCell>{match?.mentor?.name || match.mentorName || match?.mentor?.email || 'N/A'}</TableCell>
-              <TableCell>{match?.mentee?.name || match.menteeName || match?.mentee?.email || 'N/A'}</TableCell>
+              <TableCell>{mentorLabel}</TableCell>
+              <TableCell>{menteeLabel}</TableCell>
               <TableCell>
                 <Chip label={status} color={getStatusColor(status)} size="small" />
               </TableCell>

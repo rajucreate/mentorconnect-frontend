@@ -75,9 +75,7 @@ const Landing = () => {
             What is MentorConnect?
           </Typography>
           <Typography variant="body1" sx={{ color: 'rgba(16,35,79,0.84)', fontSize: '1.05rem', lineHeight: 1.8 }}>
-            MentorConnect is a mentorship platform designed to connect learners with skilled mentors,
-            simplify session scheduling, and make progress measurable. Whether you are beginning your
-            journey or guiding others, the platform provides clear workflows and meaningful interactions.
+            MentorConnect connects ambitious learners with experienced mentors through structured, goal-driven sessions. From discovering the right mentor to tracking progress, the platform enables meaningful guidance that accelerates personal and professional growth.
           </Typography>
         </Paper>
       </Container>
