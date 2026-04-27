@@ -10,30 +10,72 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  Divider,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import AuthHeader from '../components/AuthHeader';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const getDashboardPath = (role) => {
+  if (role === 'MENTOR') return '/mentor-dashboard';
+  if (role === 'ADMIN') return '/admin-dashboard';
+  return '/mentee-dashboard';
+};
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+  const [googleRole, setGoogleRole] = useState(localStorage.getItem('selectedRole') || '');
+
   const { login, user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'MENTEE') navigate('/mentee-dashboard');
-      else if (user.role === 'MENTOR') navigate('/mentor-dashboard');
-      else if (user.role === 'ADMIN') navigate('/admin-dashboard');
+      navigate(getDashboardPath(user.role), { replace: true });
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const oauthToken = params.get('token');
+    const oauthError = params.get('oauthError');
+
+    if (oauthError) {
+      setError(oauthError);
+      return;
+    }
+
+    if (oauthToken) {
+      try {
+        login(oauthToken);
+        const decodedToken = jwtDecode(oauthToken);
+        navigate(getDashboardPath(decodedToken.role), { replace: true });
+      } catch {
+        setError('Google login returned an invalid token.');
+      }
+    }
+  }, [location.search, login, navigate]);
+
+  const handleGoogleLogin = () => {
+    if (!googleRole) {
+      setError('Please choose Mentee or Mentor before continuing with Google.');
+      return;
+    }
+
+    const backendBase = (api.defaults.baseURL || '').replace(/\/api\/?$/, '');
+    localStorage.setItem('selectedRole', googleRole);
+    window.location.href = `${backendBase}/api/auth/oauth2/authorize/google?role=${googleRole}`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +108,8 @@ const Login = () => {
       }
 
       login(token);
+      const decodedToken = jwtDecode(token);
+      navigate(getDashboardPath(decodedToken.role), { replace: true });
     } catch (err) {
       if (err.response) {
         setError(err.response.data?.message || 'Invalid credentials. Please try again.');
@@ -166,9 +210,51 @@ const Login = () => {
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
               </Button>
 
+              <Typography variant="subtitle2" sx={{ mt: 1, mb: 1, fontWeight: 600, color: '#10234f' }}>
+                Choose Role for Google Login
+              </Typography>
+              <ToggleButtonGroup
+                value={googleRole}
+                exclusive
+                onChange={(e, newRole) => {
+                  if (newRole) {
+                    setGoogleRole(newRole);
+                    localStorage.setItem('selectedRole', newRole);
+                  }
+                }}
+                fullWidth
+                sx={{ mb: 1 }}
+                disabled={loading}
+              >
+                <ToggleButton value="MENTEE" sx={{ textTransform: 'none', fontWeight: 600 }}>
+                  Mentee
+                </ToggleButton>
+                <ToggleButton value="MENTOR" sx={{ textTransform: 'none', fontWeight: 600 }}>
+                  Mentor
+                </ToggleButton>
+              </ToggleButtonGroup>
+
+              <Divider sx={{ my: 2 }}>or</Divider>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                size="large"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                sx={{
+                  minHeight: 44,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                }}
+              >
+                Continue with Google
+              </Button>
+
               <Typography align="center" variant="body2" sx={{ color: 'rgba(16,35,79,0.8)' }}>
                 Don&apos;t have an account?{' '}
-                <Link to="/" style={{ color: '#315ed1', textDecoration: 'none', fontWeight: 600 }}>
+                <Link to="/register" style={{ color: '#315ed1', textDecoration: 'none', fontWeight: 600 }}>
                   Choose role and register
                 </Link>
               </Typography>

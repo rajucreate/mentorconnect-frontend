@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -54,6 +54,33 @@ const sectionShell = {
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [isLeaving, setIsLeaving] = useState(false);
+  const transitionTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) {
+        window.clearTimeout(transitionTimerRef.current);
+      }
+    };
+  }, []);
+
+  const navigateWithExitTransition = (path) => {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        navigate(path);
+      });
+      return;
+    }
+
+    setIsLeaving(true);
+    if (transitionTimerRef.current) {
+      window.clearTimeout(transitionTimerRef.current);
+    }
+    transitionTimerRef.current = window.setTimeout(() => {
+      navigate(path);
+    }, 420);
+  };
 
   const selectRoleAndGoToRegister = (role) => {
     localStorage.setItem('selectedRole', role);
@@ -61,8 +88,16 @@ const Landing = () => {
   };
 
   return (
-    <Box sx={{ background: 'linear-gradient(180deg, #d8e8ff 0%, #f4f7ff 55%, #edf4ff 100%)' }}>
-      <Navbar />
+    <Box
+      sx={{
+        background: 'linear-gradient(180deg, #d8e8ff 0%, #f4f7ff 55%, #edf4ff 100%)',
+        transition: 'opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms cubic-bezier(0.22, 1, 0.36, 1)',
+        opacity: isLeaving ? 0.82 : 1,
+        transform: isLeaving ? 'translateY(-10px) scale(0.996)' : 'translateY(0) scale(1)',
+        filter: isLeaving ? 'blur(3px)' : 'blur(0)',
+      }}
+    >
+      <Navbar onLogin={() => navigateWithExitTransition('/login')} />
 
       <HeroSection
         onJoinAsMentee={() => selectRoleAndGoToRegister('MENTEE')}

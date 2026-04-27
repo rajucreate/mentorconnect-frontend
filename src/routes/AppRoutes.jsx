@@ -8,19 +8,20 @@ import MentorDashboard from '../pages/mentor/MentorDashboard';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import ChatPage from '../pages/chat/ChatPage';
 import ProtectedRoute from '../components/ProtectedRoute';
+import PageTransition from '../components/PageTransition';
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
+      <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+      <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
 
       <Route
         path="/mentee-dashboard"
         element={
           <ProtectedRoute allowedRoles={['MENTEE']}>
-            <MenteeDashboard />
+            <PageTransition><MenteeDashboard /></PageTransition>
           </ProtectedRoute>
         }
       />
@@ -29,7 +30,7 @@ const AppRoutes = () => {
         path="/mentor-dashboard"
         element={
           <ProtectedRoute allowedRoles={['MENTOR']}>
-            <MentorDashboard />
+            <PageTransition><MentorDashboard /></PageTransition>
           </ProtectedRoute>
         }
       />
@@ -38,7 +39,7 @@ const AppRoutes = () => {
         path="/admin-dashboard"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <AdminDashboard />
+            <PageTransition><AdminDashboard /></PageTransition>
           </ProtectedRoute>
         }
       />
@@ -47,7 +48,7 @@ const AppRoutes = () => {
         path="/chat"
         element={
           <ProtectedRoute>
-            <ChatPage />
+            <PageTransition><ChatPage /></PageTransition>
           </ProtectedRoute>
         }
       />

@@ -22,6 +22,7 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
+import LogoutConfirmDialog from '../../components/LogoutConfirmDialog';
 import ProgressList from '../../components/progress/ProgressList';
 import { getMyMatches } from '../../api/matchApi';
 import { getMentorSessions, updateSessionStatus as updateSessionStatusApi } from '../../api/sessionApi';
@@ -74,13 +75,19 @@ const MentorDashboard = () => {
     severity: 'success',
     message: '',
   });
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogoutRequest = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    navigate('/', { replace: true });
     logout();
-    navigate('/login');
+    setLogoutDialogOpen(false);
   };
 
   const getSessionId = (session) => {
@@ -289,7 +296,7 @@ const MentorDashboard = () => {
               <DashboardHeader
                 title="Mentor Dashboard"
                 subtitle={`Manage incoming mentorship sessions, ${user?.email || 'mentor'}.`}
-                onLogout={handleLogout}
+                onLogout={handleLogoutRequest}
                 isLight
               />
             </CardContent>
@@ -494,6 +501,11 @@ const MentorDashboard = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <LogoutConfirmDialog
+        open={logoutDialogOpen}
+        onCancel={() => setLogoutDialogOpen(false)}
+        onConfirm={handleLogoutConfirm}
+      />
       </Grid>
     </Box>
   );

@@ -27,6 +27,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AuthContext } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
+import LogoutConfirmDialog from '../../components/LogoutConfirmDialog';
 import MentorCard from '../../components/MentorCard';
 import SessionCard from '../../components/SessionCard';
 import ProgressList from '../../components/progress/ProgressList';
@@ -110,13 +111,19 @@ const MenteeDashboard = () => {
     severity: 'success',
     message: '',
   });
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogoutRequest = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    navigate('/', { replace: true });
     logout();
-    navigate('/login');
+    setLogoutDialogOpen(false);
   };
 
   const fetchMentors = useCallback(() => {
@@ -187,7 +194,27 @@ const MenteeDashboard = () => {
     }
   };
 
+  const isBookableMatch = (match) => {
+    const status = String(match?.status || '').toUpperCase();
+    return status === 'APPROVED' || status === 'ACCEPTED' || status === 'ACTIVE';
+  };
+
   const openBookingDialog = (mentor) => {
+    const mentorId = mentor?.id ?? mentor?._id ?? mentor?.mentorId;
+    const relatedMatch = matches.find((match) => {
+      const matchMentorId = match?.mentor?.id ?? match?.mentor?._id ?? match?.mentorId;
+      return String(matchMentorId) === String(mentorId);
+    });
+
+    if (!relatedMatch || !isBookableMatch(relatedMatch)) {
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: 'Send a mentor request and wait for approval before booking a session.',
+      });
+      return;
+    }
+
     setBookingMentor(mentor);
     setStartDateTime(dayjs().add(1, 'hour'));
     setEndDateTime(dayjs().add(2, 'hour'));
@@ -211,11 +238,11 @@ const MenteeDashboard = () => {
     });
 
     const matchId = relatedMatch?.id ?? relatedMatch?._id ?? relatedMatch?.matchId;
-    if (!matchId) {
+    if (!matchId || !isBookableMatch(relatedMatch)) {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: 'No valid match found for this mentor. Send a match request first.',
+        message: 'No approved match found for this mentor. Send a request and wait for approval first.',
       });
       return;
     }
@@ -262,6 +289,13 @@ const MenteeDashboard = () => {
       .filter(Boolean)
   );
 
+  const bookableMentorIdSet = new Set(
+    matches
+      .filter((match) => isBookableMatch(match))
+      .map((match) => String(match?.mentor?.id ?? match?.mentor?._id ?? match?.mentorId))
+      .filter(Boolean)
+  );
+
   const stats = [
     {
       label: 'Total Matches',
@@ -292,7 +326,7 @@ const MenteeDashboard = () => {
               <DashboardHeader
                 title="Mentee Dashboard"
                 subtitle={`Discover mentors and book sessions, ${user?.email || 'mentee'}.`}
-                onLogout={handleLogout}
+                onLogout={handleLogoutRequest}
                 isLight
               />
             </CardContent>
@@ -368,6 +402,7 @@ const MenteeDashboard = () => {
                     onBookSession={openBookingDialog}
                     requestingMentorId={requestingMentorId}
                     isAlreadyMatched={matchedMentorIdSet.has(String(mentor?.id ?? mentor?._id ?? mentor?.mentorId))}
+                    canBookSession={bookableMentorIdSet.has(String(mentor?.id ?? mentor?._id ?? mentor?.mentorId))}
                   />
                 </Grid>
               );
@@ -571,6 +606,12 @@ const MenteeDashboard = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <LogoutConfirmDialog
+        open={logoutDialogOpen}
+        onCancel={() => setLogoutDialogOpen(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </Box>
   );
 };

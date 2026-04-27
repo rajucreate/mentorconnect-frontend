@@ -1,7 +1,14 @@
 import React from 'react';
 import { Card, CardContent, CardActions, Grid, Typography, Button, CircularProgress } from '@mui/material';
 
-const MentorCard = ({ mentor, onRequestMentor, onBookSession, requestingMentorId, isAlreadyMatched }) => {
+const MentorCard = ({
+  mentor,
+  onRequestMentor,
+  onBookSession,
+  requestingMentorId,
+  isAlreadyMatched,
+  canBookSession,
+}) => {
   const mentorId = mentor?.id ?? mentor?._id ?? mentor?.mentorId;
   const isRequesting = requestingMentorId === mentorId;
 
@@ -48,10 +55,10 @@ const MentorCard = ({ mentor, onRequestMentor, onBookSession, requestingMentorId
               variant="outlined"
               className="subtle-button"
               fullWidth
-              disabled={!mentorId}
+              disabled={!mentorId || !canBookSession}
               onClick={() => onBookSession(mentor)}
             >
-              Book Session
+              {canBookSession ? 'Book Session' : 'Request Match First'}
             </Button>
           </Grid>
         </Grid>

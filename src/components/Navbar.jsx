@@ -25,7 +25,7 @@ const glassStyles = {
   boxShadow: '0 10px 40px rgba(10, 18, 47, 0.35)',
 };
 
-const Navbar = () => {
+const Navbar = ({ onLogin }) => {
   const navigate = useNavigate();
 
   const scrollTo = (id) => {
@@ -36,6 +36,10 @@ const Navbar = () => {
   };
 
   const handleLogin = () => {
+    if (onLogin) {
+      onLogin();
+      return;
+    }
     navigate('/login');
   };
 

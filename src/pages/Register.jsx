@@ -10,6 +10,9 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Divider,
 } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
@@ -32,8 +35,8 @@ const Register = () => {
 
   useEffect(() => {
     const role = localStorage.getItem('selectedRole');
-    if (!role) {
-      setError('Please select a role from the landing page before registering.');
+    if (role) {
+      setFormData(prev => ({ ...prev, role }));
     }
   }, []);
 
@@ -94,6 +97,17 @@ const Register = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSignup = () => {
+    if (!formData.role) {
+      setError('Please choose Mentee or Mentor before signing up with Google.');
+      return;
+    }
+
+    const selectedRole = formData.role;
+    const backendBase = (api.defaults.baseURL || '').replace(/\/api\/?$/, '');
+    window.location.href = `${backendBase}/api/auth/oauth2/authorize/google?role=${selectedRole}`;
   };
 
   return (
@@ -184,14 +198,49 @@ const Register = () => {
                 disabled={loading || success}
                 variant="outlined"
               />
-              <TextField
-                margin="normal"
+
+              <Typography variant="subtitle2" sx={{ mt: 2.5, mb: 1, fontWeight: 600, color: '#10234f' }}>
+                Select Your Role
+              </Typography>
+              <ToggleButtonGroup
+                value={formData.role}
+                exclusive
+                onChange={(e, newRole) => {
+                  if (newRole) {
+                    setFormData({ ...formData, role: newRole });
+                  }
+                }}
                 fullWidth
-                label="Selected Role"
-                value={formData.role || 'No role selected'}
-                disabled
-                helperText="Choose your role from the landing page"
-              />
+                sx={{ mb: 2 }}
+                disabled={loading || success}
+              >
+                <ToggleButton
+                  value="MENTEE"
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    '&.Mui-selected': {
+                      background: 'linear-gradient(135deg, #4e7dff, #31b2ff)',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  Mentee
+                </ToggleButton>
+                <ToggleButton
+                  value="MENTOR"
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    '&.Mui-selected': {
+                      background: 'linear-gradient(135deg, #4e7dff, #31b2ff)',
+                      color: '#fff',
+                    },
+                  }}
+                >
+                  Mentor
+                </ToggleButton>
+              </ToggleButtonGroup>
 
               <Button
                 type="submit"
@@ -210,6 +259,24 @@ const Register = () => {
                 disabled={loading || success || !formData.role}
               >
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
+              </Button>
+
+              <Divider sx={{ my: 2 }}>or</Divider>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                size="large"
+                onClick={handleGoogleSignup}
+                sx={{
+                  minHeight: 44,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                }}
+                disabled={loading || success}
+              >
+                Sign up with Google
               </Button>
 
               <Typography align="center" variant="body2" sx={{ color: 'rgba(16,35,79,0.8)' }}>

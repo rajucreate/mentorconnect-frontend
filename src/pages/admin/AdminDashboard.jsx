@@ -32,6 +32,7 @@ import ChartCard from '../../components/admin/ChartCard';
 import UserTable from '../../components/admin/UserTable';
 import MatchTable from '../../components/admin/MatchTable';
 import SessionTable from '../../components/admin/SessionTable';
+import LogoutConfirmDialog from '../../components/LogoutConfirmDialog';
 import { getAdminMatches, updateAdminMatchStatus } from '../../api/matchApi';
 import { getAdminSessions, updateAdminSessionStatus } from '../../api/sessionApi';
 import './adminDashboard.css';
@@ -131,13 +132,19 @@ const AdminDashboard = () => {
   const [processingMatchId, setProcessingMatchId] = useState(null);
   const [processingSessionId, setProcessingSessionId] = useState(null);
   const [sessionFilter, setSessionFilter] = useState('all');
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogoutRequest = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    navigate('/', { replace: true });
     logout();
-    navigate('/login');
+    setLogoutDialogOpen(false);
   };
 
   useEffect(() => {
@@ -176,6 +183,18 @@ const AdminDashboard = () => {
   const showSnackbar = (severity, message) => {
     setSnackbar({ open: true, severity, message });
   };
+
+  useEffect(() => {
+    if (!snackbar.open) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSnackbar((prev) => ({ ...prev, open: false }));
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [snackbar.open]);
 
   const reloadAdminData = async () => {
     try {
@@ -664,7 +683,7 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard-root">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <Topbar admin={user} onLogout={handleLogout} activeTab={activeTab} />
+      <Topbar admin={user} onLogout={handleLogoutRequest} activeTab={activeTab} />
       <div className="admin-main-content">{renderContent()}</div>
 
       {/* Delete User Dialog */}
@@ -757,6 +776,12 @@ const AdminDashboard = () => {
           {snackbar.message}
         </div>
       )}
+
+      <LogoutConfirmDialog
+        open={logoutDialogOpen}
+        onCancel={() => setLogoutDialogOpen(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </div>
   );
 };
