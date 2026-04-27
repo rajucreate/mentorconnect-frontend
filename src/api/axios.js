@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:2026/api',
+  baseURL: 'https://mentorconnect-backend-3.onrender.com/api',
 });
 
 api.interceptors.request.use(
